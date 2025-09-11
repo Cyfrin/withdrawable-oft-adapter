@@ -129,8 +129,9 @@ Here is a list of functions the default OFTAdapter has, and therefore also our O
 
 - Commit Hash: Coming soon...
 ```
-./src
+src
 ├── DisableableOFT.sol
+├── DisableableOFTAdapter.sol
 ├── DisableableOFTCore.sol
 └── WithdrawableOFTAdapter.sol
 ```
