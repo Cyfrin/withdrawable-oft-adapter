@@ -1,0 +1,3 @@
+forge-std/=lib/forge-std/src/
+@layerzerolabs/=lib/@layerzerolabs/
+contracts/ProxyOFT.sol=src/ProxyOFT.sol

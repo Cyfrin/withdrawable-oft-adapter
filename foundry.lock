@@ -1,0 +1,29 @@
+{
+  "lib/LayerZero-v2": {
+    "rev": "200cda254120375f40ed0a7e89931afb897b8891"
+  },
+  "lib/devtools": {
+    "rev": "6c87e0d9e463539ef7215a31838a7007f25fef15"
+  },
+  "lib/forge-std": {
+    "tag": {
+      "name": "v1.10.0",
+      "rev": "8bbcf6e3f8f62f419e5429a0bd89331c85c37824"
+    }
+  },
+  "lib/openzeppelin-contracts": {
+    "tag": {
+      "name": "v5.4.0",
+      "rev": "c64a1edb67b6e3f4a15cca8909c9482ad33a02b0"
+    }
+  },
+  "lib/solidity-bytes-utils": {
+    "rev": "fc502455bb2a7e26a743378df042612dd50d1eb9"
+  },
+  "reference/CakeProxyOFT/lib/forge-std": {
+    "rev": "551a2d30d7fecba7092ab45a587b5268149a48fb"
+  },
+  "reference/CakeProxyOFT/lib/openzeppelin-contracts": {
+    "rev": "fd81a96f01cc42ef1c9a5399364968d0e07e9e90"
+  }
+}
