@@ -279,12 +279,12 @@ src
 1. There are two distinct layer zero packages, `devtools` and `layerzero-v2`, please ensure we are working with the correct implementations for our use case.
 2. We used `Ownable` over `Ownable2Step` to reduce complexity. Base contracts already use `Ownable`.
 3. Openzeppelin's `Ownable` v4 defaults `msg.sender` to the `owner`, while v5 forces you to initialize with an owner, we wish to use v5.
-4. To disable layerzero functionality in the future, we essentially have a flag to revert all `_send` calls and all `lzReceive` calls. In a scenario where layerzero is compromised, this should be sufficient to stop layerzero from stealing any funds. If you find a way for layerzero to steal funds or interfere with users even after these flags are set to disable layer zero, please flag it in the audit.
+4. To disable layerzero functionality in the future, we essentially have a flag to revert all `_send` calls and all `_lzReceive` calls. In a scenario where layerzero is compromised, this should be sufficient to stop layerzero from stealing any funds. If you find a way for layerzero to steal funds or interfere with users even after these flags are set to disable layer zero, please flag it in the audit.
 
 ## What to look for
 
 The point of this codebase is to enable projects to not have to be stuck in vendor lock-in to a cross chain solution if they choose to go with LayerZero at the start. Pay special attention to anything that would make it difficult or impossible to migrate from the OFT/LayerZero setup to Chainlink CCIP (it will be helpful to read up on their documentation).
 
-If a more complex setup is required, a proxy on the original OFTAdapter contracts might be the best solution, let's try to not make something overly complex.
+If a more complex setup is required by a protocol, a proxy on the original OFTAdapter contracts might be the best solution rather than this. Let's try to not suggest something overly complex.
 
 Lows are important to find on this codebase.
