@@ -1,4 +1,4 @@
-> [!WARNING] If you use this package, it is imperitive that you understand all the inner workings of layerzero and this codebase, as there are many pitfalls to shutting off the LayerZero functionality.
+> > [!WARNING] If you use this package, it is imperitive that you understand all the inner workings of layerzero and this codebase, as there are many pitfalls to shutting off the LayerZero functionality.
 
 # Withdrawable OFT Adapter
 
