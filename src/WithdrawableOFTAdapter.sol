@@ -18,9 +18,7 @@ import {DisableableOFTAdapter} from "src/DisableableOFTAdapter.sol";
  */
 abstract contract WithdrawableOFTAdapter is DisableableOFTAdapter {
     error EmergencyWithdrawDelayNotPassed();
-    error MustBeMoreThanZero();
     error MustNotBeZeroAddress();
-    // error NotEnoughBalance();
     error EmergencyWithdrawNotInitialized();
     error EmergencyWithdrawAlreadyInitialized();
 
@@ -29,11 +27,10 @@ abstract contract WithdrawableOFTAdapter is DisableableOFTAdapter {
     uint256 internal immutable i_emergencyWithdrawDelay;
 
     uint256 internal s_emergencyWithdrawInitializedAt;
-    uint256 internal s_pendingWithdrawAmount;
     address internal s_pendingWithdrawTo;
 
-    event TokensWithdrawn(address indexed to, uint256 amount);
-    event EmergencyWithdrawInitialized(address indexed to, uint256 indexed amount, uint256 indexed timestamp);
+    event TokensWithdrawn(address indexed to);
+    event EmergencyWithdrawInitialized(address indexed to, uint256 indexed timestamp);
     event EmergencyWithdrawCancelled();
 
     /**
@@ -69,26 +66,16 @@ abstract contract WithdrawableOFTAdapter is DisableableOFTAdapter {
      * 
      * @notice Ideally you would also disable OFT Send powers while the delay is counting down
      */
-    function initializeEmergencyWithdraw(address _to, uint256 _amount) external onlyOwner {
+    function initializeEmergencyWithdraw(address _to) external onlyOwner {
         if (_to == address(0)) {
             revert MustNotBeZeroAddress();
-        }
-        if (_amount == 0) {
-            revert MustBeMoreThanZero();
         }
         if (s_emergencyWithdrawInitializedAt != 0) {
             revert EmergencyWithdrawAlreadyInitialized();
         }
         s_pendingWithdrawTo = _to;
-        s_pendingWithdrawAmount = _amount;
         s_emergencyWithdrawInitializedAt = block.timestamp;
-        emit EmergencyWithdrawInitialized(_to, _amount, block.timestamp);
-
-        // We don't do this check because tokens could be sent in later
-        // You can always cancel the emergency withdraw if you don't have enough
-        // if (innerToken.balanceOf(address(this)) < _amount) {
-        //     revert NotEnoughBalance();
-        // }
+        emit EmergencyWithdrawInitialized(_to, block.timestamp);
     }
 
     /*
@@ -99,7 +86,6 @@ abstract contract WithdrawableOFTAdapter is DisableableOFTAdapter {
             revert EmergencyWithdrawNotInitialized();
         }
         s_pendingWithdrawTo = address(0);
-        s_pendingWithdrawAmount = 0;
         s_emergencyWithdrawInitializedAt = 0;
         emit EmergencyWithdrawCancelled();
     }
@@ -116,13 +102,12 @@ abstract contract WithdrawableOFTAdapter is DisableableOFTAdapter {
             revert EmergencyWithdrawDelayNotPassed();
         }
         address to = s_pendingWithdrawTo;
-        uint256 amount = s_pendingWithdrawAmount;
         s_pendingWithdrawTo = address(0);
-        s_pendingWithdrawAmount = 0;
         s_emergencyWithdrawInitializedAt = 0;
-        emit TokensWithdrawn(to, amount);
+        emit TokensWithdrawn(to);
 
-        innerToken.safeTransfer(to, amount);
+        uint256 innerTokenBalance = innerToken.balanceOf(address(this));
+        innerToken.safeTransfer(to, innerTokenBalance);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -131,14 +116,8 @@ abstract contract WithdrawableOFTAdapter is DisableableOFTAdapter {
     function getWithdrawInformation()
         external
         view
-        returns (
-            uint256 emergencyWithdrawInitializedAt,
-            uint256 emergencyWithdrawDelay,
-            uint256 pendingWithdrawAmount,
-            address pendingWithdrawTo
-        )
+        returns (uint256 emergencyWithdrawInitializedAt, uint256 emergencyWithdrawDelay, address pendingWithdrawTo)
     {
-        return
-            (s_emergencyWithdrawInitializedAt, i_emergencyWithdrawDelay, s_pendingWithdrawAmount, s_pendingWithdrawTo);
+        return (s_emergencyWithdrawInitializedAt, i_emergencyWithdrawDelay, s_pendingWithdrawTo);
     }
 }

@@ -38,19 +38,23 @@ abstract contract DisableableOFTCore is OFTCore {
     /* 
      * @dev In case of an emergency or migration, owners can disable the OFT functionality
      * @notice Mostly likely this would be disabled during a migration
+     * 
+     * @WARNING: Once disabled, you cannot re-enable
      */
-    function setOFTSend(bool oftSendEnabled) external onlyOwner {
-        s_isOFTSendEnabled = oftSendEnabled;
-        emit SetOFTSend(oftSendEnabled);
+    function disableOFTSend() external onlyOwner {
+        s_isOFTSendEnabled = false;
+        emit SetOFTSend(false);
     }
 
     /*
      * @dev In case of an emergency or migration, owners can disable the OFT receive functionality
      * @notice Mostly likely this would be disabled during an oracle failure with LayerZero
+     * 
+     * @WARNING: Once disabled, you cannot re-enable
      */
-    function setOFTReceive(bool oftReceiveEnabled) external onlyOwner {
-        s_isOFTReceiveEnabled = oftReceiveEnabled;
-        emit SetOFTReceive(oftReceiveEnabled);
+    function disableOFTReceive() external onlyOwner {
+        s_isOFTReceiveEnabled = false;
+        emit SetOFTReceive(false);
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -65,6 +69,18 @@ abstract contract DisableableOFTCore is OFTCore {
     {
         if (!s_isOFTSendEnabled) revert OFTSendDisabled();
         return super._send(_sendParam, _fee, _refundAddress);
+    }
+
+    // @inheritdoc OAppSender
+    function _quote(uint32 _dstEid, bytes memory _message, bytes memory _options, bool _payInLzToken)
+        internal
+        view
+        virtual
+        override
+        returns (MessagingFee memory fee)
+    {
+        if (!s_isOFTSendEnabled) revert OFTSendDisabled();
+        return super._quote(_dstEid, _message, _options, _payInLzToken);
     }
 
     // @inheritdoc OFTCore

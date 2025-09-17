@@ -72,26 +72,10 @@ contract DisableableOFTTest is Test {
         emit SetOFTSend(false);
 
         vm.prank(owner);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         assertFalse(oftA.isOFTSendEnabled());
         assertTrue(oftA.isOFTReceiveEnabled()); // Receive still enabled
-    }
-
-    function test_EnableOFTSend() public {
-        // First disable
-        vm.prank(owner);
-        oftA.setOFTSend(false);
-        assertFalse(oftA.isOFTSendEnabled());
-
-        // Then enable
-        vm.expectEmit(true, false, false, false);
-        emit SetOFTSend(true);
-
-        vm.prank(owner);
-        oftA.setOFTSend(true);
-
-        assertTrue(oftA.isOFTSendEnabled());
     }
 
     function test_DisableOFTReceive() public {
@@ -99,33 +83,17 @@ contract DisableableOFTTest is Test {
         emit SetOFTReceive(false);
 
         vm.prank(owner);
-        oftA.setOFTReceive(false);
+        oftA.disableOFTReceive();
 
         assertFalse(oftA.isOFTReceiveEnabled());
         assertTrue(oftA.isOFTSendEnabled()); // Send still enabled
     }
 
-    function test_EnableOFTReceive() public {
-        // First disable
-        vm.prank(owner);
-        oftA.setOFTReceive(false);
-        assertFalse(oftA.isOFTReceiveEnabled());
-
-        // Then enable
-        vm.expectEmit(true, false, false, false);
-        emit SetOFTReceive(true);
-
-        vm.prank(owner);
-        oftA.setOFTReceive(true);
-
-        assertTrue(oftA.isOFTReceiveEnabled());
-    }
-
     function test_DisableBothSendAndReceive() public {
         // Disable both to make it a normal ERC20
         vm.startPrank(owner);
-        oftA.setOFTSend(false);
-        oftA.setOFTReceive(false);
+        oftA.disableOFTSend();
+        oftA.disableOFTReceive();
         vm.stopPrank();
 
         assertFalse(oftA.isOFTSendEnabled());
@@ -142,13 +110,13 @@ contract DisableableOFTTest is Test {
     function test_RevertsetOFTSend_NotOwner() public {
         vm.prank(alice);
         vm.expectRevert();
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
     }
 
     function test_RevertsetOFTReceive_NotOwner() public {
         vm.prank(alice);
         vm.expectRevert();
-        oftA.setOFTReceive(false);
+        oftA.disableOFTReceive();
     }
 
     // ============= Send Tests When Enabled =============
@@ -191,7 +159,7 @@ contract DisableableOFTTest is Test {
             (bound(sendAmount, 0.1 ether, 1000 ether) / oftA.decimalConversionRate()) * oftA.decimalConversionRate();
         // Disable OFT sending
         vm.prank(owner);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         // Prepare send parameters
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
@@ -206,7 +174,11 @@ contract DisableableOFTTest is Test {
             oftCmd: ""
         });
 
-        MessagingFee memory fee = oftA.quoteSend(sendParam, false);
+        vm.expectRevert(DisableableOFTCore.OFTSendDisabled.selector);
+        oftA.quoteSend(sendParam, false);
+
+        // Some Mock Fee
+        MessagingFee memory fee = MessagingFee(1, 1);
 
         // Should revert with OFTSendDisabled
         vm.prank(alice);
@@ -223,7 +195,7 @@ contract DisableableOFTTest is Test {
 
         // Disable OFT sending
         vm.prank(owner);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         // Prepare send parameters
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
@@ -238,9 +210,8 @@ contract DisableableOFTTest is Test {
             oftCmd: ""
         });
 
-        // Quote should still work even when disabled (for UI/UX)
-        MessagingFee memory fee = oftA.quoteSend(sendParam, false);
-        assertGt(fee.nativeFee, 0);
+        vm.expectRevert(DisableableOFTCore.OFTSendDisabled.selector);
+        oftA.quoteSend(sendParam, false);
     }
 
     // ============= Receive Tests =============
@@ -250,7 +221,7 @@ contract DisableableOFTTest is Test {
             (bound(sendAmount, 0.1 ether, 100 ether) / oftA.decimalConversionRate()) * oftA.decimalConversionRate();
         // Disable sending on chain A
         vm.prank(owner);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         // Bob on chain B can still send to Alice on chain A
         uint256 aliceBalanceBeforeReceive = oftA.balanceOf(alice);
@@ -288,7 +259,7 @@ contract DisableableOFTTest is Test {
 
         // Disable receiving on chain A (simulating oracle failure)
         vm.prank(owner);
-        oftA.setOFTReceive(false);
+        oftA.disableOFTReceive();
 
         // Verify receive is disabled but token still works as ERC20
         assertFalse(oftA.isOFTReceiveEnabled());
@@ -334,23 +305,11 @@ contract DisableableOFTTest is Test {
 
         // Step 2: Disable LayerZero sending for migration
         vm.prank(owner);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         // Step 3: Verify sends are blocked
         vm.prank(alice);
         vm.expectRevert(DisableableOFTCore.OFTSendDisabled.selector);
-        oftA.send{value: fee.nativeFee}(sendParam, fee, alice);
-
-        // Step 4: Users can still receive (for in-flight messages)
-        // This is simulated - in reality LayerZero would still deliver
-        oftA.mint(alice, 5 ether);
-
-        // Step 5: If needed, can re-enable
-        vm.prank(owner);
-        oftA.setOFTSend(true);
-
-        // Step 6: Verify operations resume
-        vm.prank(alice);
         oftA.send{value: fee.nativeFee}(sendParam, fee, alice);
     }
 
@@ -364,43 +323,9 @@ contract DisableableOFTTest is Test {
 
         // New owner can control OFT state
         vm.prank(alice);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         assertFalse(oftA.isOFTSendEnabled());
-    }
-
-    // ============= Edge Cases =============
-
-    function test_MultipleToggle() public {
-        // Test rapid toggling
-        vm.startPrank(owner);
-
-        oftA.setOFTSend(false);
-        assertFalse(oftA.isOFTSendEnabled());
-
-        oftA.setOFTSend(true);
-        assertTrue(oftA.isOFTSendEnabled());
-
-        oftA.setOFTSend(false);
-        assertFalse(oftA.isOFTSendEnabled());
-
-        oftA.setOFTSend(true);
-        assertTrue(oftA.isOFTSendEnabled());
-
-        vm.stopPrank();
-    }
-
-    function test_SetSameState() public {
-        // Setting to same state should still emit event
-        assertTrue(oftA.isOFTSendEnabled());
-
-        vm.expectEmit(true, false, false, false);
-        emit SetOFTSend(true);
-
-        vm.prank(owner);
-        oftA.setOFTSend(true);
-
-        assertTrue(oftA.isOFTSendEnabled());
     }
 
     // ============= Fuzz Tests =============
@@ -435,7 +360,7 @@ contract DisableableOFTTest is Test {
 
         // Disable sending
         vm.prank(owner);
-        oftA.setOFTSend(false);
+        oftA.disableOFTSend();
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
 
@@ -449,7 +374,11 @@ contract DisableableOFTTest is Test {
             oftCmd: ""
         });
 
-        MessagingFee memory fee = oftA.quoteSend(sendParam, false);
+        vm.expectRevert(DisableableOFTCore.OFTSendDisabled.selector);
+        oftA.quoteSend(sendParam, false);
+
+        // Make some mock fee
+        MessagingFee memory fee = MessagingFee(1, 1);
 
         // Should always revert regardless of amount
         vm.prank(alice);
