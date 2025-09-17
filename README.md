@@ -1,9 +1,9 @@
 > [!WARNING]
-> If you use this package, it is imperitive that you understand all the inner workings of layerzero and this codebase, as there are many pitfalls to shutting off the LayerZero functionality.
+> If you use this package, it is imperative that you understand all the inner workings of LayerZero and this codebase, as there are many pitfalls to shutting off the LayerZero functionality.
 
 # Withdrawable OFT Adapter
 
-If you choose to launch with the LayerZero achitecture, you're locking your contracts into a single cross-chain vendor that is very difficult to migrate from, and adds a lot of complexity to your token contracts. The LayerZero default install of lockboxes locks asset issuers in, and we have worked with experienced users who have regretted this. This project is a version of the OFTAdpater, which enables permissioned withdrawal of funds for migration or recovery.
+If you choose to launch with the LayerZero architecture, you're locking your contracts into a single cross-chain vendor that is very difficult to migrate from and adds a lot of complexity to your token contracts. The LayerZero default install of lockboxes locks asset issuers in, and we have worked with experienced users who have regretted this. This project is a version of the OFTAdpater, which enables permissioned withdrawal of funds for migration or recovery.
 
 This project is a minimal package that can be used to help opt-out of the LayerZero OFT system at some point down the line. Even though this codebase has been audited, during an audit, you should include the code from this package in scope as well as there are many pitfalls with integrating a package like this and LayerZero, which is not designed for people to opt-out.
 
@@ -12,7 +12,7 @@ We have seen some examples of this in the wild, such as with:
 - [CAKE](https://bscscan.com/address/0xb274202daba6ae180c665b4fbe59857b7c3a8091#code) (fallbackWithdraw + dropFailedMessage)
 - [VIRTUALS](https://github.com/twx-virtuals/virtual-oft-adapter/blob/main/contracts/VirtualOFTAdapter.sol) (fallbackWithdraw without the function to drop a message that needs withdrawal)
 
-This package allows users to withdraw or opt-out of the OFT system.
+This package allows users to withdraw or opt out of the OFT system.
 
 # Table of Contents
 - [Withdrawable OFT Adapter](#withdrawable-oft-adapter)
@@ -135,7 +135,7 @@ Here is a list of functions the default OFTAdapter has, and therefore also our O
 
 # User notes
 
-- Do not user this package if you already have tokens deployed across multiple chains. You'd need a custom MintBurnOFTAdpater as well.
+- Do not use this package if you already have tokens deployed across multiple chains. You'd need a custom `MintBurnOFTAdpater` as well.
 - Do not use this package if you want more flexible options for migration off of LayerZero. A proxy of the OFTAdapter is a better solution for that.
 - If you choose to disable the LayerZero/OFT functionality, you will not be able to re-enable it on these contracts. You'd have to deploy a new set of adapters to do so.
 - The owners of this codebase essentially have the power to rug users on all destination chains at any time if they choose to do so.
