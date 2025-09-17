@@ -20,10 +20,7 @@ This package allows users to withdraw or opt-out of the OFT system.
   - [Requirements](#requirements)
   - [Quickstart](#quickstart)
 - [Comparison to Default OFTAdapter](#comparison-to-default-oftadapter)
-- [Audit Information](#audit-information)
   - [Known Issues](#known-issues)
-  - [Audit Notes](#audit-notes)
-  - [What to look for](#what-to-look-for)
 - [User notes](#user-notes)
 
 # Getting Started
@@ -107,7 +104,7 @@ Here is a list of functions the default OFTAdapter has, and therefore also our O
 |----------------------------------------------------------------------------------------------------+------------|
 | 👀 quoteOFT((uint32,bytes32,uint256,uint256,bytes,bytes,bytes))                                       | 0d35b415   |
 |----------------------------------------------------------------------------------------------------+------------|
-| 👀 quoteSend((uint32,bytes32,uint256,uint256,bytes,bytes,bytes),bool)                                 | 3b6f743b   |
+| ✅ quoteSend((uint32,bytes32,uint256,uint256,bytes,bytes,bytes),bool)                                 | 3b6f743b   |
 |----------------------------------------------------------------------------------------------------+------------|
 | 👌 renounceOwnership()                                                                                | 715018a6   |
 |----------------------------------------------------------------------------------------------------+------------|
@@ -131,169 +128,9 @@ Here is a list of functions the default OFTAdapter has, and therefore also our O
 ╰----------------------------------------------------------------------------------------------------+------------╯
 ```
 
-# Audit Information
-
-- Commit Hash: Coming soon...
-```
-src
-├── DisableableOFT.sol
-├── DisableableOFTAdapter.sol
-├── DisableableOFTCore.sol
-└── WithdrawableOFTAdapter.sol
-```
-- Solc Version: ^0.8.20 (These are intentially not specific!)
-- Chain(s) to deploy contracts [see list here](https://docs.layerzero.network/v2/deployments/deployed-contracts):
-    - (Developers should be aware of their EVM settings before deploying to each chain, so issues with unsupported opcodes like PUSH0 due to different solidity versions is not valid here)
-  - Abstract Mainnet
-  - Animechain Mainnet
-  - Ape Mainnet
-  - Apex Fusion Nexus Mainnet
-  - Aptos
-  - Arbitrum Mainnet
-  - Arbitrum Nova Mainnet
-  - Astar Mainnet
-  - Astar zkEVM Mainnet
-  - Avalanche Mainnet
-  - Bahamut Mainnet
-  - Base Mainnet
-  - Beam Mainnet
-  - Berachain Mainnet
-  - Bevm Mainnet
-  - Bitlayer Mainnet
-  - Blast Mainnet
-  - BNB Smart Chain (BSC) Mainnet
-  - BOB Mainnet
-  - Bouncebit Mainnet
-  - Botanix
-  - Canto Mainnet
-  - Celo Mainnet
-  - Codex Mainnet
-  - Concrete
-  - Conflux eSpace Mainnet
-  - CoreDAO Mainnet
-  - Corn Mainnet
-  - Cronos EVM Mainnet
-  - Cronos zkEVM Mainnet
-  - Cyber Mainnet
-  - Degen Mainnet
-  - Dexalot Subnet Mainnet
-  - DFK Chain
-  - DM2 Verse Mainnet
-  - DOS Chain Mainnet
-  - EDU Chain Mainnet
-  - Ethereum Mainnet
-  - Etherlink Mainnet
-  - EVM on Flow Mainnet
-  - Fantom Mainnet
-  - Flare Mainnet
-  - Fraxtal Mainnet
-  - Fuse Mainnet
-  - Glue Mainnet
-  - Gnosis Mainnet
-  - Goat Mainnet
-  - Gravity Mainnet
-  - Gunz Mainnet
-  - Harmony Mainnet
-  - Hedera Mainnet
-  - Hemi Mainnet
-  - Homeverse Mainnet
-  - Humanity Mainnet
-  - Horizen EON Mainnet
-  - Hubble Mainnet
-  - HyperEVM Mainnet
-  - inEVM Mainnet
-  - Initia Mainnet
-  - Ink Mainnet
-  - Iota Mainnet
-  - Japan Open Chain Mainnet
-  - Kaia Mainnet (formerly Klaytn)
-  - Kava Mainnet
-  - Katana
-  - Lens Mainnet
-  - Lightlink Mainnet
-  - Linea Mainnet
-  - Lisk Mainnet
-  - Loot Mainnet
-  - Lyra Mainnet
-  - Manta Pacific Mainnet
-  - Mantle Mainnet
-  - Merlin Mainnet
-  - Meter Mainnet
-  - Metis Mainnet
-  - Mode Mainnet
-  - Moonbeam Mainnet
-  - Moonriver Mainnet
-  - Morph Mainnet
-  - Movement Mainnet
-  - Near Aurora Mainnet
-  - Nibiru Mainnet
-  - OKX Mainnet
-  - opBNB Mainnet
-  - Optimism Mainnet
-  - Orderly Mainnet
-  - Otherworld Space Mainnet
-  - Peaq Mainnet
-  - Plume Mainnet
-  - Polygon Mainnet
-  - Polygon zkEVM Mainnet
-  - Rari Chain Mainnet
-  - re.al Mainnet
-  - Reya Mainnet
-  - Rootstock Mainnet
-  - Sanko Mainnet
-  - Scroll Mainnet
-  - Sei Mainnet
-  - Shimmer Mainnet
-  - Silicon Mainnet
-  - Skale Mainnet
-  - Solana Mainnet
-  - Soneium Mainnet
-  - Sonic Mainnet
-  - Sophon Mainnet
-  - Somnia Mainnet
-  - Story Mainnet
-  - Subtensor EVM Mainnet
-  - Superposition Mainnet
-  - Swell Mainnet
-  - Tac
-  - Taiko Mainnet
-  - TelosEVM Mainnet
-  - Tenet Mainnet
-  - Tiltyard Mainnet
-  - TON Mainnet
-  - Tron Mainnet
-  - Unichain Mainnet
-  - Vana Mainnet
-  - Viction Mainnet
-  - Worldchain Mainnet
-  - X Layer Mainnet
-  - Xai Mainnet
-  - XChain Mainnet
-  - XDC Mainnet
-  - XPLA Mainnet
-  - Zircuit Mainnet
-  - zkLink Mainnet
-  - zkSync Era Mainnet
-  - Zora Mainnet
-
 ## Known Issues
 - We use `__` instead of `_` prefixes sometimes to avoid shadowing variables.
 - Anything in the `report.md` report from Aderyn is known.
-
-## Audit Notes
-
-1. There are two distinct layer zero packages, `devtools` and `layerzero-v2`, please ensure we are working with the correct implementations for our use case.
-2. We used `Ownable` over `Ownable2Step` to reduce complexity. Base contracts already use `Ownable`.
-3. Openzeppelin's `Ownable` v4 defaults `msg.sender` to the `owner`, while v5 forces you to initialize with an owner, we wish to use v5.
-4. To disable layerzero functionality in the future, we essentially have a flag to revert all `_send` calls and all `lzReceive` calls. In a scenario where layerzero is compromised, this should be sufficient to stop layerzero from stealing any funds. If you find a way for layerzero to steal funds or interfere with users even after these flags are set to disable layer zero, please flag it in the audit.
-
-## What to look for
-
-The point of this codebase is to enable projects to not have to be stuck in vendor lock-in to a cross chain solution if they choose to go with LayerZero at the start. Pay special attention to anything that would make it difficult or impossible to migrate from the OFT/LayerZero setup to Chainlink CCIP (it will be helpful to read up on their documentation).
-
-If a more complex setup is required, a proxy on the original OFTAdapter contracts might be the best solution, let's try to not make something overly complex.
-
-Lows are important to find on this codebase.
 
 # User notes
 
@@ -303,3 +140,6 @@ Lows are important to find on this codebase.
 - The owners of this codebase essentially have the power to rug users on all destination chains at any time if they choose to do so.
 - Understand that when you migrate, you should [clear](https://docs.layerzero.network/v2/developers/evm/troubleshooting/debugging-messages#clearing-message) any messages that have not been delivered yet.
 - This codebase is not compatible with rebasing tokens.
+- If you use the adapter with OFT tokens and disable the source and destination chains, in order to "restart" with OFT functionality, you'd need to deploy a new adapter for your token, and then you'd need to wrap the OFT tokens in mint and burn adapters (not in this repo). 
+- This pacakge is meant to be deployed when you already have a token on a main chain, but do not have tokens on any other chains other than your tokens home base. If you already have tokens on multiple chains, you will need a custom `MintBurnOFTAdapter` as well, which is not in this repo.
+- If you wish to use any functionality outside of this repo, it is recommended you use a proxy instead. Using either this repo or a proxy **will mean there are strong centralization vectors on your token.** This is a blessing and a curse, if your team is compromised or you make a mistake you can do a lot of damage to token holders.
