@@ -1,6 +1,11 @@
+> [!WARNING] If you use this package, it is imperitive that you understand all the inner workings of layerzero and this codebase, as there are many pitfalls to shutting off the LayerZero functionality.
+
 # Withdrawable OFT Adapter
 
-The LayerZero default install of lockboxes locks asset issuers in, and we have experienced users who have regretted this. This project is a version of the OFTAdpater, which enables permissioned withdrawal of funds for migration or recovery.
+If you choose to launch with the LayerZero achitecture, you're locking your contracts into a single cross-chain vendor that is very difficult to migrate from, and adds a lot of complexity to your token contracts. The LayerZero default install of lockboxes locks asset issuers in, and we have worked with experienced users who have regretted this. This project is a version of the OFTAdpater, which enables permissioned withdrawal of funds for migration or recovery.
+
+This project is a minimal package that can be used to help opt-out of the LayerZero OFT system at some point down the line. Even though this codebase has been audited, during an audit, you should include the code from this package in scope as well as there are many pitfalls with integrating a package like this and LayerZero, which is not designed for people to opt-out.
+
 We have seen some examples of this in the wild, such as with:
 
 - [CAKE](https://bscscan.com/address/0xb274202daba6ae180c665b4fbe59857b7c3a8091#code) (fallbackWithdraw + dropFailedMessage)
@@ -19,8 +24,9 @@ This package allows users to withdraw or opt-out of the OFT system.
   - [Known Issues](#known-issues)
   - [Audit Notes](#audit-notes)
   - [What to look for](#what-to-look-for)
+- [User notes](#user-notes)
 
-# Getting Started 
+# Getting Started
 
 ## Requirements
 
@@ -288,3 +294,13 @@ The point of this codebase is to enable projects to not have to be stuck in vend
 If a more complex setup is required by a protocol, a proxy on the original OFTAdapter contracts might be the best solution rather than this. Let's try to not suggest something overly complex.
 
 Lows are important to find on this codebase.
+
+# User notes
+
+- Do not user this package if you already have tokens deployed across multiple chains. You'd need a custom MintBurnOFTAdpater as well.
+- Do not use this package if you want more flexible options for migration off of LayerZero. A proxy of the OFTAdapter is a better solution for that.
+- If you choose to disable the LayerZero/OFT functionality, you will not be able to re-enable it on these contracts. You'd have to deploy a new set of adapters to do so.
+- The owners of this codebase essentially have the power to rug users on all destination chains at any time if they choose to do so.
+- Understand that when you migrate, you should [clear](https://docs.layerzero.network/v2/developers/evm/troubleshooting/debugging-messages#clearing-message) any messages that have not been delivered yet.
+- This codebase is not compatible with rebasing tokens.
+

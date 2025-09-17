@@ -11,6 +11,7 @@ import {
     MessagingReceipt,
     Origin
 } from "@layerzerolabs/oft-evm/contracts/OFTCore.sol";
+import {OAppSender} from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSender.sol";
 import {DisableableOFTCore, Ownable, OFT} from "src/DisableableOFTCore.sol";
 
 /**
@@ -53,5 +54,16 @@ abstract contract DisableableOFT is DisableableOFTCore, OFT {
         bytes calldata _extraData // @dev unused in the default implementation.
     ) internal virtual override(DisableableOFTCore, OFTCore) {
         return DisableableOFTCore._lzReceive(_origin, _guid, _message, address(0), _extraData);
+    }
+
+    // @inheritdoc OFTCore
+    function _quote(uint32 _dstEid, bytes memory _message, bytes memory _options, bool _payInLzToken)
+        internal
+        view
+        virtual
+        override(DisableableOFTCore, OAppSender)
+        returns (MessagingFee memory fee)
+    {
+        return DisableableOFTCore._quote(_dstEid, _message, _options, _payInLzToken);
     }
 }
